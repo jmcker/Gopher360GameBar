@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -25,6 +26,12 @@ namespace Gopher360GameBar
         public MainPage()
         {
             this.InitializeComponent();
+        }
+
+        private void TestButton_Click(object sender, RoutedEventArgs e)
+        {
+            TestButton.Content = "Clicked";
+            Debug.WriteLine("Button clicked");
         }
     }
 }

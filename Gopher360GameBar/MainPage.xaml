@@ -8,7 +8,11 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
-
-    </Grid>
+    <StackPanel
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        Orientation="Vertical">
+        <TextBlock Padding="0,0,0,5" Text="Test Page" HorizontalAlignment="Center" />
+        <Button x:Name="TestButton" Click="TestButton_Click">Click Me</Button>
+    </StackPanel>
 </Page>

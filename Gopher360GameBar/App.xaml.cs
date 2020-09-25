@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -14,6 +15,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Microsoft.Gaming.XboxGameBar;
 
 namespace Gopher360GameBar
 {
@@ -22,6 +24,8 @@ namespace Gopher360GameBar
     /// </summary>
     sealed partial class App : Application
     {
+        private XboxGameBarWidget toggleWidget = null;
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -32,6 +36,76 @@ namespace Gopher360GameBar
             this.Suspending += OnSuspending;
         }
 
+        protected override void OnActivated(IActivatedEventArgs args)
+        {
+            Debug.WriteLine("Started via OnActivated (game bar)");
+
+            XboxGameBarWidgetActivatedEventArgs widgetArgs = null;
+            if (args.Kind == ActivationKind.Protocol)
+            {
+                var protocolArgs = args as IProtocolActivatedEventArgs;
+                string scheme = protocolArgs.Uri.Scheme;
+                if (scheme.Equals("ms-gamebarwidget"))
+                {
+                    widgetArgs = args as XboxGameBarWidgetActivatedEventArgs;
+                }
+            }
+
+            if (widgetArgs != null)
+            {
+                //
+                // Activation Notes:
+                //
+                //    If IsLaunchActivation is true, this is Game Bar launching a new instance
+                // of our widget. This means we have a NEW CoreWindow with corresponding UI
+                // dispatcher, and we MUST create and hold onto a new XboxGameBarWidget.
+                //
+                // Otherwise this is a subsequent activation coming from Game Bar. We MUST
+                // continue to hold the XboxGameBarWidget created during initial activation
+                // and ignore this repeat activation, or just observe the URI command here and act
+                // accordingly.  It is ok to perform a navigate on the root frame to switch
+                // views/pages if needed.  Game Bar lets us control the URI for sending widget to
+                // widget commands or receiving a command from another non-widget process.
+                //
+                // Important Cleanup Notes:
+                //    When our widget is closed--by Game Bar or us calling XboxGameBarWidget.Close()-,
+                // the CoreWindow will get a closed event.  We can register for Window.Closed
+                // event to know when our particular widget has shutdown, and cleanup accordingly.
+                //
+                // NOTE: If a widget's CoreWindow is the LAST CoreWindow being closed for the process
+                // then we won't get the Window.Closed event.  However, we will get the OnSuspending
+                // call and can use that for cleanup.
+                //
+                if (widgetArgs.IsLaunchActivation)
+                {
+                    var rootFrame = new Frame();
+                    rootFrame.NavigationFailed += OnNavigationFailed;
+                    Window.Current.Content = rootFrame;
+
+                    // Create Game Bar widget object which bootstraps the connection with Game Bar
+                    this.toggleWidget = new XboxGameBarWidget(
+                        widgetArgs,
+                        Window.Current.CoreWindow,
+                        rootFrame);
+                    rootFrame.Navigate(typeof(MainPage));
+
+                    Window.Current.Closed += ToggleWidget_Closed;
+
+                    Window.Current.Activate();
+                }
+                else
+                {
+                    // You can perform whatever behavior you need based on the URI payload.
+                }
+            }
+        }
+
+        private void ToggleWidget_Closed(object sender, Windows.UI.Core.CoreWindowEventArgs e)
+        {
+            this.toggleWidget = null;
+            Window.Current.Closed -= ToggleWidget_Closed;
+        }
+
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used such as when the application is launched to open a specific file.
@@ -39,6 +113,8 @@ namespace Gopher360GameBar
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
+            Debug.WriteLine("Started via OnLaunched (normal UWP)");
+
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -68,6 +144,7 @@ namespace Gopher360GameBar
                     // parameter
                     rootFrame.Navigate(typeof(MainPage), e.Arguments);
                 }
+
                 // Ensure the current window is active
                 Window.Current.Activate();
             }
@@ -93,7 +170,9 @@ namespace Gopher360GameBar
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
-            //TODO: Save application state and stop any background activity
+
+            this.toggleWidget = null;
+
             deferral.Complete();
         }
     }
