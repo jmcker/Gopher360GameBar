@@ -4,8 +4,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.ApplicationModel;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Foundation.Metadata;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -23,15 +25,23 @@ namespace Gopher360GameBar
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private int count = 0;
+
         public MainPage()
         {
             this.InitializeComponent();
         }
 
-        private void TestButton_Click(object sender, RoutedEventArgs e)
+        private async void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            TestButton.Content = "Clicked";
-            Debug.WriteLine("Button clicked");
+            count += 1;
+
+            TestButton.Content = "Clicked " + count;
+
+            if (ApiInformation.IsApiContractPresent("Windows.ApplicationModel.FullTrustAppContract", 1, 0))
+            {
+                await FullTrustProcessLauncher.LaunchFullTrustProcessForCurrentAppAsync();
+            }
         }
     }
 }
