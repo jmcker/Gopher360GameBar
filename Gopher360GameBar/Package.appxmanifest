@@ -9,19 +9,19 @@
 
   <Identity
     Name="9b0e16c8-ea9e-4afa-97f1-9cb3a830d2e4"
-    Publisher="CN=jmcke"
+    Publisher="CN=jmcker"
     Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="9b0e16c8-ea9e-4afa-97f1-9cb3a830d2e4" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>Gopher360GameBar</DisplayName>
-    <PublisherDisplayName>jmcke</PublisherDisplayName>
+    <PublisherDisplayName>jmcker</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
   <Dependencies>
-    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.18362.693" MaxVersionTested="10.0.18363.693" />
   </Dependencies>
 
   <Resources>
@@ -32,36 +32,36 @@
     <Application Id="App"
       Executable="$targetnametoken$.exe"
       EntryPoint="Gopher360GameBar.App">
-    <Extensions>
-      <uap3:Extension Category="windows.appExtension">
-        <uap3:AppExtension Name="microsoft.gameBarUIExtension"
-                            Id="Gopher360Toggle"
-                            DisplayName="Gopher360"
-                            Description="Toggle Gopher360 from the Xbox Game Bar using a mouse or remote"
-                            PublicFolder="GameBar">
-          <uap3:Properties>
-            <GameBarWidget Type="Standard">
-              <HomeMenuVisible>true</HomeMenuVisible>
-              <PinningSupported>true</PinningSupported>
-              <Window>
-                <Size>
-                  <Height>200</Height>
-                  <Width>200</Width>
-                  <MinHeight>200</MinHeight>
-                  <MinWidth>200</MinWidth>
-                  <MaxHeight>200</MaxHeight>
-                  <MaxWidth>200</MaxWidth>
-                </Size>
-                <ResizeSupported>
-                  <Horizontal>false</Horizontal>
-                  <Vertical>false</Vertical>
-                </ResizeSupported>
-              </Window>
-            </GameBarWidget>
-          </uap3:Properties>
-        </uap3:AppExtension>
-      </uap3:Extension>
-    </Extensions>
+      <Extensions>
+        <uap3:Extension Category="windows.appExtension">
+          <uap3:AppExtension Name="microsoft.gameBarUIExtension"
+                              Id="Gopher360Toggle"
+                              DisplayName="Gopher360"
+                              Description="Toggle Gopher360 from the Xbox Game Bar using a mouse or remote"
+                              PublicFolder="GameBar">
+            <uap3:Properties>
+              <GameBarWidget Type="Standard">
+                <HomeMenuVisible>true</HomeMenuVisible>
+                <PinningSupported>true</PinningSupported>
+                <Window>
+                  <Size>
+                    <Height>200</Height>
+                    <Width>200</Width>
+                    <MinHeight>200</MinHeight>
+                    <MinWidth>200</MinWidth>
+                    <MaxHeight>200</MaxHeight>
+                    <MaxWidth>200</MaxWidth>
+                  </Size>
+                  <ResizeSupported>
+                    <Horizontal>false</Horizontal>
+                    <Vertical>false</Vertical>
+                  </ResizeSupported>
+                </Window>
+              </GameBarWidget>
+            </uap3:Properties>
+          </uap3:AppExtension>
+        </uap3:Extension>
+      </Extensions>
       <uap:VisualElements
         DisplayName="Gopher360GameBar"
         Square150x150Logo="Assets\Square150x150Logo.png"
