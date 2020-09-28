@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.AppService;
+using System.Reflection;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Foundation.Metadata;
@@ -39,6 +40,10 @@ namespace Gopher360GameBar
         {
             this.InitializeComponent();
             App.AppServiceConnected += MainPage_AppServiceConnected;
+
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            Log(assembly.GetName().Name + " v" + assembly.GetName().Version);
+            Log("");
 
             // Since we can't seem to get focus properly in Game Bar
             // start Gopher by default
