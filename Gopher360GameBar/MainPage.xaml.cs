@@ -39,6 +39,10 @@ namespace Gopher360GameBar
         {
             this.InitializeComponent();
             App.AppServiceConnected += MainPage_AppServiceConnected;
+
+            // Since we can't seem to get focus properly in Game Bar
+            // start Gopher by default
+            TestButton_Click(null, null);
         }
 
         private async void TestButton_Click(object sender, RoutedEventArgs e)
