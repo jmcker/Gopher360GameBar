@@ -8,11 +8,28 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <StackPanel
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center"
-        Orientation="Vertical">
-        <TextBlock Padding="0,0,0,5" Text="Test Page" HorizontalAlignment="Center" />
-        <Button x:Name="TestButton" Click="TestButton_Click">Click Me</Button>
-    </StackPanel>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5*"></RowDefinition>
+            <RowDefinition Height="5*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <StackPanel
+            Grid.Row="0"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Orientation="Vertical">
+            <!-- <TextBlock Padding="0,0,0,5" Text="Gopher360" HorizontalAlignment="Center" /> -->
+            <Button x:Name="TestButton" Click="TestButton_Click">Start Gopher360</Button>
+        </StackPanel>
+        <ScrollViewer
+            Grid.Row="1"
+            Padding="5,0,5,0"
+            HorizontalScrollBarVisibility="Auto" 
+            VerticalScrollBarVisibility="Auto">
+            <TextBlock x:Name="LogBlock" TextWrapping="Wrap" FontFamily="Consolas" Text="" />
+        </ScrollViewer>
+    </Grid>
 </Page>

@@ -16,6 +16,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Microsoft.Gaming.XboxGameBar;
+using Windows.ApplicationModel.AppService;
+using Windows.ApplicationModel.Background;
 
 namespace Gopher360GameBar
 {
@@ -25,6 +27,10 @@ namespace Gopher360GameBar
     sealed partial class App : Application
     {
         private XboxGameBarWidget toggleWidget = null;
+
+        public static BackgroundTaskDeferral AppServiceDeferral = null;
+        public static AppServiceConnection Connection = null;
+        public static event EventHandler AppServiceConnected;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -36,9 +42,41 @@ namespace Gopher360GameBar
             this.Suspending += OnSuspending;
         }
 
+        private void ToggleWidget_Closed(object sender, Windows.UI.Core.CoreWindowEventArgs e)
+        {
+            this.toggleWidget = null;
+            Window.Current.Closed -= ToggleWidget_Closed;
+        }
+
+        protected override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
+        {
+            // connection established from the fulltrust process
+            if (args.TaskInstance.TriggerDetails is AppServiceTriggerDetails)
+            {
+                AppServiceDeferral = args.TaskInstance.GetDeferral();
+                args.TaskInstance.Canceled += OnTaskCanceled;
+
+                if (args.TaskInstance.TriggerDetails is AppServiceTriggerDetails details)
+                {
+                    Connection = details.AppServiceConnection;
+                    AppServiceConnected?.Invoke(this, null);
+                }
+            }
+        }
+
+        private void OnTaskCanceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
+        {
+            if (AppServiceDeferral != null)
+            {
+                AppServiceDeferral.Complete();
+            }
+        }
+
         protected override void OnActivated(IActivatedEventArgs args)
         {
             Debug.WriteLine("Started via OnActivated (game bar)");
+
+            OnLaunchOrActivate();
 
             XboxGameBarWidgetActivatedEventArgs widgetArgs = null;
             if (args.Kind == ActivationKind.Protocol)
@@ -100,12 +138,6 @@ namespace Gopher360GameBar
             }
         }
 
-        private void ToggleWidget_Closed(object sender, Windows.UI.Core.CoreWindowEventArgs e)
-        {
-            this.toggleWidget = null;
-            Window.Current.Closed -= ToggleWidget_Closed;
-        }
-
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used such as when the application is launched to open a specific file.
@@ -114,6 +146,8 @@ namespace Gopher360GameBar
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
             Debug.WriteLine("Started via OnLaunched (normal UWP)");
+
+            OnLaunchOrActivate();
 
             Frame rootFrame = Window.Current.Content as Frame;
 
@@ -148,6 +182,12 @@ namespace Gopher360GameBar
                 // Ensure the current window is active
                 Window.Current.Activate();
             }
+        }
+
+                // Common code between OnLaunched and OnActivated
+        private void OnLaunchOrActivate()
+        {
+
         }
 
         /// <summary>
