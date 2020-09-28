@@ -36,8 +36,8 @@
         <desktop:Extension Category="windows.fullTrustProcess" Executable="Gopher360Bridge\Gopher360Bridge.exe" />
         <uap3:Extension Category="windows.appExtension">
           <uap3:AppExtension Name="microsoft.gameBarUIExtension"
-                              Id="Gopher360Toggle"
-                              DisplayName="Gopher360"
+                              Id="Gopher360GameBar"
+                              DisplayName="Gopher360GameBar"
                               Description="Toggle Gopher360 from the Xbox Game Bar using a mouse or remote"
                               PublicFolder="GameBar">
             <uap3:Properties>
@@ -67,7 +67,7 @@
         </uap:Extension>
       </Extensions>
       <uap:VisualElements
-        DisplayName="Gopher360"
+        DisplayName="Gopher360GameBar"
         Description="Toggle Gopher360 from the Xbox Game Bar using a mouse or remote"
         BackgroundColor="transparent"
         Square150x150Logo="Images\Square150x150Logo.png"
