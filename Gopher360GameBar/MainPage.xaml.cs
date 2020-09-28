@@ -126,6 +126,12 @@ namespace Gopher360GameBar
 
             AppServiceResponse response = await App.Connection.SendMessageAsync(values);
 
+            if (response.Message == null)
+            {
+                Log("FAIL: \t\tBridge hung up or sent null response");
+                return false;
+            }
+
             object status;
             object msg;
             response.Message.TryGetValue("STATUS", out status);
@@ -144,10 +150,25 @@ namespace Gopher360GameBar
             });
         }
 
-        private void MainPage_AppServiceConnected(object sender, EventArgs e)
+        private void MainPage_AppServiceConnected(object sender, EventArgs args)
         {
             Log("STATUS: \tConnected to Gopher360Bridge");
             bridgeConnectedTcs.TrySetResult(true);
+            App.Connection.RequestReceived += Connection_RequestReceived;
+        }
+
+        private void Connection_RequestReceived(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
+        {
+            var messageDeferral = args.GetDeferral();
+
+            object status;
+            object msg;
+            args.Request.Message.TryGetValue("STATUS", out status);
+            args.Request.Message.TryGetValue("MESSAGE", out msg);
+
+            Log(status?.ToString() + ":\t\t" + msg?.ToString());
+
+            messageDeferral.Complete();
         }
     }
 }

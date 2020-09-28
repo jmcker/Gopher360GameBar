@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.AppService;
 using Windows.Foundation.Collections;
 
@@ -32,8 +33,8 @@ namespace Gopher360Bridge
 
             Console.WriteLine("CWD: \t" + Directory.GetCurrentDirectory());
             Console.WriteLine("Home: \t" + home);
-            Console.WriteLine("Install: \t" + installationFolder);
-            Console.WriteLine("Gopher: \t" + gopherPath);
+            Console.WriteLine("Install: " + installationFolder);
+            Console.WriteLine("Gopher:  " + gopherPath);
             Console.WriteLine("");
 
             appServiceExit = new AutoResetEvent(false);
@@ -75,7 +76,7 @@ namespace Gopher360Bridge
             string msg;
             string status;
 
-            Console.WriteLine("Received command: " + command);
+            Console.WriteLine("COMMAND: \t" + command);
 
             switch (command)
             {
@@ -89,9 +90,20 @@ namespace Gopher360Bridge
 
                     try
                     {
-                        gopherProcess = StartProcess();
+                        // Stop other external Gopher processes
+                        StopAllExistingGopherProcesses();
+
+                        gopherProcess = StartGopherProcess();
+
+                        if (gopherProcess.HasExited)
+                        {
+                            status = "FAIL";
+                            msg = "Gopher360 crashed";
+                            break;
+                        }
+
                         status = "OK";
-                        msg = "Gopher360 started with PID " + gopherProcess.Id + " (alive: " + !gopherProcess.HasExited + ")";
+                        msg = "Gopher360 started with PID " + gopherProcess.Id;
                     }
                     catch (Exception e)
                     {
@@ -135,12 +147,7 @@ namespace Gopher360Bridge
                     break;
             }
 
-            ValueSet response = new ValueSet();
-            response.Add("STATUS", status);
-            response.Add("MESSAGE", msg);
-
-            Console.WriteLine("STATUS: \t" + status);
-            Console.WriteLine("MESSAGE: \t" + msg);
+            ValueSet response = PrepMessage(status, msg);
 
             try
             {
@@ -154,16 +161,64 @@ namespace Gopher360Bridge
             }
         }
 
-        private static Process StartProcess()
+        private static Process StartGopherProcess()
         {
             ProcessStartInfo pi = new ProcessStartInfo();
             pi.FileName = gopherPath;
             pi.WorkingDirectory = home;
             pi.UseShellExecute = false;
+            pi.RedirectStandardOutput = true;
+            pi.RedirectStandardError = true;
             pi.CreateNoWindow = true;
             pi.WindowStyle = ProcessWindowStyle.Hidden;
 
-            return Process.Start(pi);
+            Process p = Process.Start(pi);
+
+            // Log the output to the UWP display
+            // Task.Run(() => {
+            //     while (!p.StandardOutput.EndOfStream)
+            //     {
+            //         string line = p.StandardOutput.ReadLine();
+            //         Console.WriteLine(line);
+            //         SendMessage("LOG", line);
+            //     }
+            // });
+            // Task.Run(() => {
+            //     while (!p.StandardError.EndOfStream)
+            //     {
+            //         string line = p.StandardError.ReadLine();
+            //         Console.WriteLine(line);
+            //         SendMessage("LOG", line);
+            //     }
+            // });
+
+            return p;
+        }
+
+        private static void StopAllExistingGopherProcesses()
+        {
+            foreach (Process p in Process.GetProcessesByName("Gopher"))
+            {
+                SendMessage("LOG", "Stopping existing Gopher360 instance with PID " + p.Id);
+                p.Kill();
+            }
+        }
+
+        private static void SendMessage(string status, string msg)
+        {
+            ValueSet prepped = PrepMessage(status, msg);
+            _ = connection.SendMessageAsync(prepped); // Don't await since we don't care about the response
+        }
+
+        private static ValueSet PrepMessage(string status, string msg)
+        {
+            ValueSet response = new ValueSet();
+            response.Add("STATUS", status);
+            response.Add("MESSAGE", msg);
+
+            Console.WriteLine(status + ": \t" + msg);
+
+            return response;
         }
     }
 }
