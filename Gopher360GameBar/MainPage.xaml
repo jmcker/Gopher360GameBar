@@ -21,16 +21,30 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Orientation="Vertical">
-            <!-- <TextBlock Padding="0,0,0,5" Text="Gopher360" HorizontalAlignment="Center" /> -->
-            <Button x:Name="TestButton" IsTabStop="True" Click="TestButton_Click">Start Gopher360</Button>
+            <Button
+                x:Name="StartStopButton"
+                IsTabStop="True"
+                Visibility="Visible"
+                Click="StartStopButton_Click"
+            >
+                Start Gopher360
+            </Button>
         </StackPanel>
         <ScrollViewer
             Grid.Row="1"
             Padding="5,0,5,0"
-            HorizontalScrollBarVisibility="Auto" 
+            HorizontalScrollBarVisibility="Auto"
             VerticalScrollBarVisibility="Auto"
-            IsTabStop="True">
-            <TextBlock x:Name="LogBlock" TextWrapping="Wrap" FontFamily="Consolas" Text="" />
+            IsTabStop="True"
+            Visibility="Visible"
+            IsFocusEngagementEnabled="True"
+        >
+            <TextBlock
+                x:Name="LogBlock"
+                TextWrapping="Wrap"
+                FontFamily="Consolas"
+                Text=""
+            />
         </ScrollViewer>
     </Grid>
 </Page>

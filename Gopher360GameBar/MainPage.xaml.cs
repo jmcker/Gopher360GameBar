@@ -41,16 +41,29 @@ namespace Gopher360GameBar
             this.InitializeComponent();
             App.AppServiceConnected += MainPage_AppServiceConnected;
 
+            // Debugging focus issues in Game Bar
+            // https://docs.microsoft.com/en-us/windows/apps/design/input/gamepad-and-remote-interactions
+            // this.GotFocus += (object sender, RoutedEventArgs e) =>
+            // {
+            //     FrameworkElement focus = FocusManager.GetFocusedElement() as FrameworkElement;
+            //     if (focus != null)
+            //     {
+            //         Log("Got focus: " + focus.Name + " (" + focus.GetType().ToString() + ")");
+            //     }
+            // };
+
             Assembly assembly = Assembly.GetExecutingAssembly();
-            Log(assembly.GetName().Name + " v" + assembly.GetName().Version);
+            Version version = assembly.GetName().Version;
+            String shortVersion = version.Major + "." + version.Minor + "." + version.MajorRevision;
+            Log(assembly.GetName().Name + " v" + shortVersion);
             Log("");
 
             // Since we can't seem to get focus properly in Game Bar
             // start Gopher by default
-            TestButton_Click(null, null);
+            StartStopButton_Click(null, null);
         }
 
-        private async void TestButton_Click(object sender, RoutedEventArgs e)
+        private async void StartStopButton_Click(object sender, RoutedEventArgs e)
         {
             bool connected = await ConnectBridge();
             if (!connected)
@@ -72,7 +85,7 @@ namespace Gopher360GameBar
             if (success)
             {
                 gopherActive = true;
-                TestButton.Content = "Stop Gopher360";
+                StartStopButton.Content = "Stop Gopher360";
             }
 
             return success;
@@ -84,7 +97,7 @@ namespace Gopher360GameBar
             if (success)
             {
                 gopherActive = false;
-                TestButton.Content = "Start Gopher360";
+                StartStopButton.Content = "Start Gopher360";
             }
 
             return success;
