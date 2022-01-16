@@ -10,6 +10,15 @@ with a keyboard and mouse.
 
 This application makes this possible with just an Xbox remote.
 
+### Gopher360GameBar in Xbox Game Bar ###
+![Gopher360GameBar in Xbox Game Bar](docs/gopher-game-bar.png)
+
+### Gopher360GameBar UWP App ###
+![Gopher260GameBar UWP App](docs/gopher-uwp.png)
+
+## Installation ##
+
+Open and build the `Gopher360GameBar.sln` in Visual Studio.
 
 ## Notes ##
 
